@@ -11,10 +11,6 @@ const Chatbot: React.FC = () => {
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   
-  // Configuration from environment variables
-  const systemPrompt = import.meta.env.VITE_SYSTEM_PROMPT || 'You are a helpful AI assistant for Vosme International Sdn Bhd. You provide information about AI consultation, architecture, and development services.';
-  const knowledgeBaseUrl = import.meta.env.VITE_KNOWLEDGE_BASE_URL || '';
-
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = () => {
@@ -36,11 +32,7 @@ const Chatbot: React.FC = () => {
     try {
       const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY || '' });
       
-      // Construct the full system instruction with knowledge base
-      let fullSystemInstruction = systemPrompt;
-      if (knowledgeBaseUrl) {
-        fullSystemInstruction += `\n\nReference Knowledge Base URL: ${knowledgeBaseUrl}\n(Note: Use this URL as a reference context for your answers if applicable.)`;
-      }
+      const systemPrompt = 'You are a helpful AI assistant for Vosme International Sdn Bhd. You provide information about AI consultation, architecture, and development services.';
 
       // Convert messages to Content format for the API
       // Note: The API expects 'user' and 'model' roles.
@@ -62,7 +54,7 @@ const Chatbot: React.FC = () => {
         model: "gemini-2.5-flash",
         contents: contents,
         config: {
-          systemInstruction: fullSystemInstruction,
+          systemInstruction: systemPrompt,
         },
       });
 
