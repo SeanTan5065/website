@@ -1,27 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence, useScroll, useTransform } from 'motion/react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
-
-const slides = [
-  {
-    id: 1,
-    image: 'https://images.unsplash.com/photo-1531482615713-2afd69097998?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80',
-    title: 'AI Consultation & Architecture',
-    subtitle: 'Building the future with intelligent systems designed for your business.',
-  },
-  {
-    id: 2,
-    image: 'https://images.unsplash.com/photo-1550751827-4bd374c3f58b?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80',
-    title: 'Custom Web & App Development',
-    subtitle: 'Tailored digital solutions to elevate your brand and operations.',
-  },
-  {
-    id: 3,
-    image: 'https://images.unsplash.com/photo-1555949963-ff9fe0c870eb?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80',
-    title: 'AI Environment Setup',
-    subtitle: 'Optimized infrastructure for seamless AI integration and performance.',
-  },
-];
+import { useLanguage } from '../contexts/LanguageContext';
 
 const Hero: React.FC = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
@@ -31,13 +11,35 @@ const Hero: React.FC = () => {
     offset: ["start start", "end start"]
   });
   const y = useTransform(scrollYProgress, [0, 1], ["0%", "50%"]);
+  const { t } = useLanguage();
+
+  const slides = [
+    {
+      id: 1,
+      image: 'https://images.unsplash.com/photo-1531482615713-2afd69097998?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80',
+      title: t('heroSlide1Title'),
+      subtitle: t('heroSlide1Subtitle'),
+    },
+    {
+      id: 2,
+      image: 'https://images.unsplash.com/photo-1550751827-4bd374c3f58b?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80',
+      title: t('heroSlide2Title'),
+      subtitle: t('heroSlide2Subtitle'),
+    },
+    {
+      id: 3,
+      image: 'https://images.unsplash.com/photo-1555949963-ff9fe0c870eb?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80',
+      title: t('heroSlide3Title'),
+      subtitle: t('heroSlide3Subtitle'),
+    },
+  ];
 
   useEffect(() => {
     const timer = setInterval(() => {
       setCurrentSlide((prev) => (prev + 1) % slides.length);
     }, 5000);
     return () => clearInterval(timer);
-  }, []);
+  }, [slides.length]);
 
   const nextSlide = () => {
     setCurrentSlide((prev) => (prev + 1) % slides.length);
@@ -93,26 +95,31 @@ const Hero: React.FC = () => {
 
       <button 
         onClick={prevSlide}
-        className="absolute left-4 top-1/2 -translate-y-1/2 bg-white/10 hover:bg-white/20 text-white p-2 rounded-full backdrop-blur-sm transition-colors z-10"
+        className="absolute left-4 top-1/2 -translate-y-1/2 bg-white/10 hover:bg-white/20 text-white p-2 rounded-full backdrop-blur-sm transition-colors z-10 focus:outline-none focus-visible:ring-2 focus-visible:ring-white"
+        aria-label="Previous slide"
       >
         <ChevronLeft size={32} />
       </button>
       
       <button 
         onClick={nextSlide}
-        className="absolute right-4 top-1/2 -translate-y-1/2 bg-white/10 hover:bg-white/20 text-white p-2 rounded-full backdrop-blur-sm transition-colors z-10"
+        className="absolute right-4 top-1/2 -translate-y-1/2 bg-white/10 hover:bg-white/20 text-white p-2 rounded-full backdrop-blur-sm transition-colors z-10 focus:outline-none focus-visible:ring-2 focus-visible:ring-white"
+        aria-label="Next slide"
       >
         <ChevronRight size={32} />
       </button>
 
-      <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex space-x-2 z-10">
+      <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex space-x-2 z-10" role="tablist">
         {slides.map((_, index) => (
           <button
             key={index}
             onClick={() => setCurrentSlide(index)}
-            className={`w-3 h-3 rounded-full transition-colors ${
+            className={`w-3 h-3 rounded-full transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-gray-900 ${
               index === currentSlide ? 'bg-white' : 'bg-white/40 hover:bg-white/60'
             }`}
+            aria-label={`Go to slide ${index + 1}`}
+            role="tab"
+            aria-selected={index === currentSlide}
           />
         ))}
       </div>

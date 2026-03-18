@@ -1,27 +1,58 @@
 import React from 'react';
 import { motion } from 'motion/react';
+import { useLanguage } from '../contexts/LanguageContext';
 
 const About: React.FC = () => {
+  const { t } = useLanguage();
+
   return (
     <section id="about" className="py-20 bg-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="lg:grid lg:grid-cols-2 lg:gap-16 items-center">
           <motion.div
-            initial={{ opacity: 0, x: -50 }}
-            whileInView={{ opacity: 1, x: 0 }}
+            initial="hidden"
+            whileInView="visible"
             viewport={{ once: true }}
-            transition={{ duration: 0.8 }}
+            variants={{
+              hidden: { opacity: 0, x: -50 },
+              visible: {
+                opacity: 1,
+                x: 0,
+                transition: {
+                  duration: 0.8,
+                  staggerChildren: 0.2
+                }
+              }
+            }}
             className="mb-12 lg:mb-0"
           >
-            <h2 className="text-3xl font-extrabold text-gray-900 sm:text-4xl mb-6">
-              About Vosme International
-            </h2>
-            <p className="text-lg text-gray-600 mb-6">
-              Vosme International Sdn Bhd is a premier AI consultation firm dedicated to transforming businesses through intelligent technology. We specialize in architectural design and implementation of AI systems, ensuring that your organization is ready for the future.
-            </p>
-            <p className="text-lg text-gray-600">
-              Our expertise extends beyond consultation; we provide comprehensive environment setup for AI workloads and develop customized web and mobile applications tailored to your specific needs. Located in Muar, Johor, we serve clients with a commitment to innovation and excellence.
-            </p>
+            <motion.h2 
+              variants={{
+                hidden: { opacity: 0, y: 20 },
+                visible: { opacity: 1, y: 0 }
+              }}
+              className="text-3xl font-extrabold text-gray-900 sm:text-4xl mb-6"
+            >
+              {t('aboutTitle')}
+            </motion.h2>
+            <motion.p 
+              variants={{
+                hidden: { opacity: 0, y: 20 },
+                visible: { opacity: 1, y: 0 }
+              }}
+              className="text-lg text-gray-600 mb-6"
+            >
+              {t('aboutP1')}
+            </motion.p>
+            <motion.p 
+              variants={{
+                hidden: { opacity: 0, y: 20 },
+                visible: { opacity: 1, y: 0 }
+              }}
+              className="text-lg text-gray-600"
+            >
+              {t('aboutP2')}
+            </motion.p>
           </motion.div>
           
           <motion.div
@@ -35,6 +66,7 @@ const About: React.FC = () => {
               src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" 
               alt="Team collaboration" 
               className="w-full h-full object-cover"
+              referrerPolicy="no-referrer"
             />
           </motion.div>
         </div>
