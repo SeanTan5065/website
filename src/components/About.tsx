@@ -55,13 +55,14 @@ const About: React.FC = () => {
             </motion.p>
           </motion.div>
           
-          <motion.div
-            initial={{ opacity: 0, x: 50 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.8 }}
-            className="relative rounded-2xl overflow-hidden shadow-xl"
-          >
+            <motion.div
+              initial={{ opacity: 0, x: 50 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.8 }}
+              whileHover={{ scale: 1.03 }}
+              className="relative rounded-2xl overflow-hidden shadow-xl transition-transform duration-500 cursor-pointer"
+            >
             <img 
               src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" 
               alt="Team collaboration" 

@@ -80,6 +80,8 @@ const Chatbot: React.FC = () => {
           errorMessage = t('chatErrorNetwork') || 'Network error. Please check your internet connection.';
         } else if (errorMsg.includes('429') || errorMsg.includes('quota')) {
           errorMessage = t('chatErrorRateLimit') || 'I am receiving too many messages right now. Please try again in a minute.';
+        } else {
+          errorMessage = `System Error: ${error.message}`;
         }
       }
       

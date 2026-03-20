@@ -95,7 +95,7 @@ const Hero: React.FC = () => {
 
       <button 
         onClick={prevSlide}
-        className="absolute left-4 top-1/2 -translate-y-1/2 bg-white/10 hover:bg-white/20 text-white p-2 rounded-full backdrop-blur-sm transition-colors z-10 focus:outline-none focus-visible:ring-2 focus-visible:ring-white"
+        className="absolute left-4 top-1/2 -translate-y-1/2 bg-white/10 hover:bg-white/20 hover:scale-110 text-white p-2 rounded-full backdrop-blur-sm transition-all z-10 focus:outline-none focus-visible:ring-2 focus-visible:ring-white"
         aria-label="Previous slide"
       >
         <ChevronLeft size={32} />
@@ -103,7 +103,7 @@ const Hero: React.FC = () => {
       
       <button 
         onClick={nextSlide}
-        className="absolute right-4 top-1/2 -translate-y-1/2 bg-white/10 hover:bg-white/20 text-white p-2 rounded-full backdrop-blur-sm transition-colors z-10 focus:outline-none focus-visible:ring-2 focus-visible:ring-white"
+        className="absolute right-4 top-1/2 -translate-y-1/2 bg-white/10 hover:bg-white/20 hover:scale-110 text-white p-2 rounded-full backdrop-blur-sm transition-all z-10 focus:outline-none focus-visible:ring-2 focus-visible:ring-white"
         aria-label="Next slide"
       >
         <ChevronRight size={32} />

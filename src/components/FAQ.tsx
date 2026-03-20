@@ -40,7 +40,7 @@ const FAQ: React.FC = () => {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: index * 0.1, duration: 0.5 }}
-              className="border border-gray-200 rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow"
+              className="border border-gray-200 rounded-xl overflow-hidden shadow-sm hover:shadow-md hover:scale-[1.01] hover:-translate-y-1 transition-all duration-300"
             >
               <button
                 onClick={() => toggleFAQ(index)}

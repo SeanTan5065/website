@@ -1,5 +1,5 @@
 import React from 'react';
-import { Facebook, Twitter, Linkedin, Instagram } from 'lucide-react';
+import { Facebook, Instagram } from 'lucide-react';
 import Logo from './Logo';
 import { useLanguage } from '../contexts/LanguageContext';
 
@@ -33,10 +33,8 @@ const Footer: React.FC = () => {
           <div>
             <h4 className="text-lg font-semibold mb-4">{t('footerConnect')}</h4>
             <div className="flex space-x-4">
-              <a href="#" className="text-gray-400 hover:text-white transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-white rounded-sm" aria-label="Facebook"><Facebook size={20} /></a>
-              <a href="#" className="text-gray-400 hover:text-white transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-white rounded-sm" aria-label="Twitter"><Twitter size={20} /></a>
-              <a href="#" className="text-gray-400 hover:text-white transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-white rounded-sm" aria-label="LinkedIn"><Linkedin size={20} /></a>
-              <a href="#" className="text-gray-400 hover:text-white transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-white rounded-sm" aria-label="Instagram"><Instagram size={20} /></a>
+              <a href="https://www.facebook.com/VOSMEInternational" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-white rounded-sm" aria-label="Facebook"><Facebook size={20} /></a>
+              <a href="https://www.instagram.com/vosme_international/" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-white rounded-sm" aria-label="Instagram"><Instagram size={20} /></a>
             </div>
           </div>
         </div>

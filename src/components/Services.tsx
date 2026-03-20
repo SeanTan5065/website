@@ -55,7 +55,7 @@ const Services: React.FC = () => {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: index * 0.1, duration: 0.5 }}
-              className="bg-white rounded-xl shadow-md p-8 hover:shadow-lg transition-shadow"
+              className="bg-white rounded-xl shadow-md p-8 hover:shadow-xl hover:-translate-y-2 hover:scale-[1.02] transition-all duration-300"
             >
               <motion.div 
                 whileHover={{ scale: 1.1, rotate: 5 }}
