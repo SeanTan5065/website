@@ -6,14 +6,19 @@ import Markdown from 'react-markdown';
 import { useLanguage } from '../contexts/LanguageContext';
 
 const AISuggestion: React.FC = () => {
-  const [description, setDescription] = useState('');
+  const [industry, setIndustry] = useState('');
+  const [businessType, setBusinessType] = useState('');
+  const [teamSize, setTeamSize] = useState('');
+  const [workflow, setWorkflow] = useState('');
+  const [challenges, setChallenges] = useState('');
+  const [tools, setTools] = useState('');
   const [suggestion, setSuggestion] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
   const { t, language } = useLanguage();
 
   const handleGenerate = async () => {
-    if (!description.trim()) {
+    if (!industry.trim() || !workflow.trim() || !challenges.trim()) {
       setError(t('aiErrorEmpty'));
       return;
     }
@@ -22,6 +27,15 @@ const AISuggestion: React.FC = () => {
     setError('');
     setSuggestion('');
 
+    const fullDescription = `
+Industry: ${industry}
+Business Type: ${businessType}
+Team Size: ${teamSize}
+Current Workflow: ${workflow}
+Biggest Challenges: ${challenges}
+Current Tools: ${tools}
+    `.trim();
+
     try {
       const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
       const languageInstruction = language === 'zh' ? 'Please respond in Simplified Chinese.' : language === 'ms' ? 'Please respond in Bahasa Malaysia.' : 'Please respond in English.';
@@ -29,7 +43,7 @@ const AISuggestion: React.FC = () => {
         model: 'gemini-2.5-flash',
         contents: `You are an expert AI consultant at Vosme International. A potential client has provided the following description of their company:
         
-"${description}"
+"${fullDescription}"
 
 Based on this description, suggest 3 highly practical and impactful ways they can implement AI to improve their business, increase efficiency, or drive growth.
 Keep the tone professional, encouraging, and concise. Format the response using Markdown with bullet points or numbered lists. ${languageInstruction}`,
@@ -58,6 +72,7 @@ Keep the tone professional, encouraging, and concise. Format the response using 
   };
 
   const handleWhatsApp = () => {
+    const description = `Industry: ${industry}\nBusiness Type: ${businessType}\nTeam Size: ${teamSize}\nWorkflow: ${workflow}\nChallenges: ${challenges}\nTools: ${tools}`;
     const message = `*AI Implementation Inquiry*\n\n*Company Description:*\n${description}\n\nI would like to discuss implementing AI solutions for my business based on the suggestions provided.`;
     const whatsappUrl = `https://wa.me/60187607799?text=${encodeURIComponent(message)}`;
     window.open(whatsappUrl, '_blank');
@@ -88,19 +103,36 @@ Keep the tone professional, encouraging, and concise. Format the response using 
         >
           <div className="p-6 sm:p-10">
             <div className="mb-6">
-              <label htmlFor="company-description" className="block text-sm font-medium text-gray-700 mb-2">
-                {t('aiLabel')}
-              </label>
-              <textarea
-                id="company-description"
-                rows={4}
-                className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all resize-none"
-                placeholder={t('aiPlaceholder')}
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-                aria-invalid={error ? "true" : "false"}
-                aria-describedby={error ? "ai-suggestion-error" : undefined}
-              />
+            <div className="mb-8 space-y-4 text-left">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">{t('aiFieldIndustry')}</label>
+                  <input type="text" className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none transition-all" value={industry} onChange={e => setIndustry(e.target.value)} />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">{t('aiFieldBusinessType')}</label>
+                  <input type="text" className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none transition-all" placeholder="e.g. B2B, B2C" value={businessType} onChange={e => setBusinessType(e.target.value)} />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">{t('aiFieldTeamSize')}</label>
+                  <input type="text" className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none transition-all" placeholder="e.g. 1-10" value={teamSize} onChange={e => setTeamSize(e.target.value)} />
+                </div>
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">{t('aiFieldWorkflow')}</label>
+                <textarea rows={2} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none transition-all resize-none" value={workflow} onChange={e => setWorkflow(e.target.value)} />
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">{t('aiFieldChallenges')}</label>
+                <textarea rows={2} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none transition-all resize-none" value={challenges} onChange={e => setChallenges(e.target.value)} />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">{t('aiFieldTools')}</label>
+                <input type="text" className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none transition-all" value={tools} onChange={e => setTools(e.target.value)} />
+              </div>
               {error && (
                 <motion.div 
                   initial={{ opacity: 0, y: -10 }} 
@@ -125,10 +157,11 @@ Keep the tone professional, encouraging, and concise. Format the response using 
                 </motion.div>
               )}
             </div>
+            </div>
 
             <button
               onClick={handleGenerate}
-              disabled={isLoading || !description.trim()}
+              disabled={isLoading || !industry.trim() || !workflow.trim() || !challenges.trim()}
               className="w-full sm:w-auto flex items-center justify-center space-x-2 bg-indigo-600 text-white px-8 py-3 rounded-xl font-semibold hover:bg-indigo-700 hover:scale-105 hover:shadow-lg transition-all duration-200 disabled:opacity-70 disabled:cursor-not-allowed focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2"
               aria-busy={isLoading}
             >
