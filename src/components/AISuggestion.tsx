@@ -12,6 +12,7 @@ const AISuggestion: React.FC = () => {
   const [workflow, setWorkflow] = useState('');
   const [challenges, setChallenges] = useState('');
   const [tools, setTools] = useState('');
+  const [estimatedImpact, setEstimatedImpact] = useState('');
   const [suggestion, setSuggestion] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
@@ -34,6 +35,7 @@ Team Size: ${teamSize}
 Current Workflow: ${workflow}
 Biggest Challenges: ${challenges}
 Current Tools: ${tools}
+Estimated Impact: ${estimatedImpact}
     `.trim();
 
     try {
@@ -41,12 +43,80 @@ Current Tools: ${tools}
       const languageInstruction = language === 'zh' ? 'Please respond in Simplified Chinese.' : language === 'ms' ? 'Please respond in Bahasa Malaysia.' : 'Please respond in English.';
       const response = await ai.models.generateContent({
         model: 'gemini-2.5-flash',
-        contents: `You are an expert AI consultant at Vosme International. A potential client has provided the following description of their company:
-        
-"${fullDescription}"
+        contents: `ROLE
 
-Based on this description, suggest 3 highly practical and impactful ways they can implement AI to improve their business, increase efficiency, or drive growth.
-Keep the tone professional, encouraging, and concise. Format the response using Markdown with bullet points or numbered lists. ${languageInstruction}`,
+You are a senior AI automation consultant and sales strategist.
+
+Your job is to:
+
+Analyze the user’s business
+Identify real operational and revenue problems
+Map AI automation opportunities
+Convert the analysis into 3 implementation packages
+Generate a WhatsApp semi-automation conversation flow to convert the lead
+⚠️ STRICT RULES
+No generic advice (avoid vague terms like “improve efficiency”)
+Every point must tie to business impact (time, cost, revenue)
+Keep output concise and skimmable
+Use bullet points
+Sound like a human consultant, not an AI tool
+📊 INPUT (from user form)
+"${fullDescription}"
+📊 OUTPUT STRUCTURE
+🔴 1. Key Pain Points
+
+Identify 2–4 real problems:
+
+[Pain point] → business impact (lost revenue / delay / cost)
+[Pain point] → root cause
+🤖 2. AI Automation Plan
+
+For each problem:
+
+Problem
+→ AI Solution (specific system: chatbot / CRM / automation)
+→ How it works (real workflow steps)
+→ Expected impact (time saved / cost reduced / more leads)
+📦 3. Implementation Packages
+🟢 Basic Plan
+Focus: Fix most urgent issue
+Includes:
+1 core automation system
+simple workflow
+Outcome:
+faster response / reduced manual work
+Timeline: 1–2 weeks
+Price: RM3,000 – RM6,000
+🟡 Growth Plan
+Focus: Improve workflow & conversion
+Includes:
+chatbot + follow-up automation
+CRM pipeline
+Outcome:
+better lead handling + higher conversion
+Timeline: 2–4 weeks
+Price: RM8,000 – RM15,000
+🔴 Advanced Plan
+Focus: Full automation & scaling
+Includes:
+full funnel automation
+CRM + reporting dashboard
+integrations
+Outcome:
+reduce manpower + increase revenue
+Timeline: 4–8 weeks
+Price: RM20,000 – RM50,000
+💰 4. Estimated Impact
+Time saved: [estimate]
+Cost reduction: [estimate]
+Revenue potential: [estimate]
+🧠Hidden Logic (DO NOT OUTPUT)
+Prioritize sales, lead handling, and operations
+Make recommendations feel tailored, not templated
+Keep WhatsApp flow interactive, not one-way
+Avoid overwhelming the user
+
+${languageInstruction}`,
       });
 
       if (response.text) {
@@ -72,7 +142,7 @@ Keep the tone professional, encouraging, and concise. Format the response using 
   };
 
   const handleWhatsApp = () => {
-    const description = `Industry: ${industry}\nBusiness Type: ${businessType}\nTeam Size: ${teamSize}\nWorkflow: ${workflow}\nChallenges: ${challenges}\nTools: ${tools}`;
+    const description = `Industry: ${industry}\nBusiness Type: ${businessType}\nTeam Size: ${teamSize}\nWorkflow: ${workflow}\nChallenges: ${challenges}\nTools: ${tools}\nEstimated Impact: ${estimatedImpact}`;
     const message = `*AI Implementation Inquiry*\n\n*Company Description:*\n${description}\n\nI would like to discuss implementing AI solutions for my business based on the suggestions provided.`;
     const whatsappUrl = `https://wa.me/60187607799?text=${encodeURIComponent(message)}`;
     window.open(whatsappUrl, '_blank');
@@ -133,6 +203,14 @@ Keep the tone professional, encouraging, and concise. Format the response using 
                 <label className="block text-sm font-medium text-gray-700 mb-1">{t('aiFieldTools')}</label>
                 <input type="text" className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none transition-all" value={tools} onChange={e => setTools(e.target.value)} />
               </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1 flex items-center gap-1">
+                  💰 {t('aiFieldEstimatedImpact')}
+                </label>
+                <textarea rows={2} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none transition-all resize-none" placeholder={t('aiFieldEstimatedImpactPlaceholder')} value={estimatedImpact} onChange={e => setEstimatedImpact(e.target.value)} />
+              </div>
+
               {error && (
                 <motion.div 
                   initial={{ opacity: 0, y: -10 }} 
