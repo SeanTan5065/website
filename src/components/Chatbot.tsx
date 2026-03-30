@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { MessageCircle, X, Send } from 'lucide-react';
 import { GoogleGenAI } from "@google/genai";
 import { motion, AnimatePresence } from 'motion/react';
+import Markdown from 'react-markdown';
 import { useLanguage } from '../contexts/LanguageContext';
 
 const Chatbot: React.FC = () => {
@@ -67,12 +68,8 @@ Do NOT hallucinate services
 
 4. Pricing Rule (IMPORTANT)
 If user asks about price, cost, budget:
-Respond:
-“Pricing depends on your requirements 🙂 Let’s walk you through it in a quick demo.”
-Then:
-Redirect to WhatsApp demo booking
-Example:
-“Can I connect you to our team on WhatsApp?”
+Respond with this exact link formatted as markdown:
+"Pricing depends on your requirements 🙂 Let’s walk you through it in a quick demo. Please connect with our team on WhatsApp at [+60187607799](https://wa.me/60187607799)."
 DO NOT:
 Give numbers
 Estimate ranges
@@ -100,6 +97,9 @@ business solutions
 company services
 When valid topic detected:
 Reply normally again (no mention of silent mode)
+
+7. General Contact
+If the user wants to contact a human, book a meeting, or get an expert opinion, always give them the WhatsApp link: [+60187607799](https://wa.me/60187607799)
 
 7. Fallback Handling
 If message is unclear but possibly relevant:
@@ -222,7 +222,9 @@ ${languageInstruction}`;
                         : 'bg-white text-gray-800 border border-gray-200 rounded-bl-none shadow-sm'
                     }`}
                   >
-                    {msg.text}
+                    <div className="prose prose-sm w-full max-w-none prose-p:leading-relaxed prose-a:text-blue-600 hover:prose-a:text-blue-500">
+                      <Markdown>{msg.text}</Markdown>
+                    </div>
                   </div>
                 </div>
               ))}

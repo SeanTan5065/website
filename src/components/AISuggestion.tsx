@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { motion } from 'motion/react';
 import { Sparkles, Loader2, MessageCircle, AlertCircle } from 'lucide-react';
-import { GoogleGenAI } from '@google/genai';
 import Markdown from 'react-markdown';
 import { useLanguage } from '../contexts/LanguageContext';
+import { GoogleGenAI } from "@google/genai";
 
 const AISuggestion: React.FC = () => {
   const [industry, setIndustry] = useState('');
@@ -17,10 +17,9 @@ const AISuggestion: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
   const { t, language } = useLanguage();
-
   const handleGenerate = async () => {
     if (!industry.trim() || !workflow.trim() || !challenges.trim()) {
-      setError(t('aiErrorEmpty'));
+      setError(t('aiErrorEmpty') || 'Please fill in the required fields.');
       return;
     }
 
@@ -39,100 +38,38 @@ Estimated Impact: ${estimatedImpact}
     `.trim();
 
     try {
-      const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
       const languageInstruction = language === 'zh' ? 'Please respond in Simplified Chinese.' : language === 'ms' ? 'Please respond in Bahasa Malaysia.' : 'Please respond in English.';
+      const systemPrompt = `You are an expert AI implementation strategist for Vosme.
+The user will provide details about their business, team, workflows, and challenges.
+Your goal is to provide 2-3 specific, actionable AI implementation suggestions that would genuinely help them.
+Do not hallucinate. Be extremely concise but professional. Tell them EXACTLY what AI tool or system to use to solve their problem.
+
+${languageInstruction}`;
+
+      const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY || '' });
+      
       const response = await ai.models.generateContent({
-        model: 'gemini-2.5-flash',
-        contents: `ROLE
-
-You are a senior AI automation consultant and sales strategist.
-
-Your job is to:
-
-Analyze the user’s business
-Identify real operational and revenue problems
-Map AI automation opportunities
-Convert the analysis into 3 implementation packages
-Generate a WhatsApp semi-automation conversation flow to convert the lead
-⚠️ STRICT RULES
-No generic advice (avoid vague terms like “improve efficiency”)
-Every point must tie to business impact (time, cost, revenue)
-Keep output concise and skimmable
-Use bullet points
-Sound like a human consultant, not an AI tool
-📊 INPUT (from user form)
-"${fullDescription}"
-📊 OUTPUT STRUCTURE
-🔴 1. Key Pain Points
-
-Identify 2–4 real problems:
-
-[Pain point] → business impact (lost revenue / delay / cost)
-[Pain point] → root cause
-🤖 2. AI Automation Plan
-
-For each problem:
-
-Problem
-→ AI Solution (specific system: chatbot / CRM / automation)
-→ How it works (real workflow steps)
-→ Expected impact (time saved / cost reduced / more leads)
-📦 3. Implementation Packages
-🟢 Basic Plan
-Focus: Fix most urgent issue
-Includes:
-1 core automation system
-simple workflow
-Outcome:
-faster response / reduced manual work
-Timeline: 1–2 weeks
-Price: RM3,000 – RM6,000
-🟡 Growth Plan
-Focus: Improve workflow & conversion
-Includes:
-chatbot + follow-up automation
-CRM pipeline
-Outcome:
-better lead handling + higher conversion
-Timeline: 2–4 weeks
-Price: RM8,000 – RM15,000
-🔴 Advanced Plan
-Focus: Full automation & scaling
-Includes:
-full funnel automation
-CRM + reporting dashboard
-integrations
-Outcome:
-reduce manpower + increase revenue
-Timeline: 4–8 weeks
-Price: RM20,000 – RM50,000
-💰 4. Estimated Impact
-Time saved: [estimate]
-Cost reduction: [estimate]
-Revenue potential: [estimate]
-🧠Hidden Logic (DO NOT OUTPUT)
-Prioritize sales, lead handling, and operations
-Make recommendations feel tailored, not templated
-Keep WhatsApp flow interactive, not one-way
-Avoid overwhelming the user
-
-${languageInstruction}`,
+        model: "gemini-2.5-flash",
+        contents: fullDescription,
+        config: {
+          systemInstruction: systemPrompt,
+        },
       });
 
       if (response.text) {
         setSuggestion(response.text);
       } else {
-        setError(t('aiErrorFail'));
+        throw new Error('No response generated');
       }
     } catch (err) {
       console.error('Error generating AI suggestion:', err);
-      let errorMessage = t('aiErrorGeneral');
+      let errorMessage = t('aiErrorGeneral') || 'Failed to generate suggestions.';
       if (err instanceof Error) {
         const errorMsg = err.message.toLowerCase();
         if (errorMsg.includes('fetch') || errorMsg.includes('network')) {
-          errorMessage = t('aiErrorNetwork');
+          errorMessage = t('aiErrorNetwork') || 'Network Error';
         } else if (errorMsg.includes('429') || errorMsg.includes('quota')) {
-          errorMessage = t('aiErrorRateLimit');
+          errorMessage = t('aiErrorRateLimit') || 'Rate Limit Exceeded';
         }
       }
       setError(errorMessage);
@@ -144,7 +81,7 @@ ${languageInstruction}`,
   const handleWhatsApp = () => {
     const description = `Industry: ${industry}\nBusiness Type: ${businessType}\nTeam Size: ${teamSize}\nWorkflow: ${workflow}\nChallenges: ${challenges}\nTools: ${tools}\nEstimated Impact: ${estimatedImpact}`;
     const message = `*AI Implementation Inquiry*\n\n*Company Description:*\n${description}\n\nI would like to discuss implementing AI solutions for my business based on the suggestions provided.`;
-    const whatsappUrl = `https://wa.me/60187607799?text=${encodeURIComponent(message)}`;
+    const whatsappUrl = `https://api.whatsapp.com/send?phone=+60187607799&text=${encodeURIComponent(message)}`;
     window.open(whatsappUrl, '_blank');
   };
 
@@ -255,6 +192,8 @@ ${languageInstruction}`,
                 </>
               )}
             </button>
+
+
 
             {suggestion && (
               <motion.div
