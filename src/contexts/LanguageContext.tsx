@@ -1,4 +1,4 @@
-import React, { createContext, useState, useContext, ReactNode } from 'react';
+import React, { createContext, useState, useEffect, useContext, ReactNode } from 'react';
 
 export type Language = 'en' | 'zh' | 'ms';
 
@@ -372,9 +372,17 @@ const LanguageContext = createContext<LanguageContextType | undefined>(undefined
 
 export const LanguageProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [language, setLanguage] = useState<Language>('en');
+  const [dynamicTrans, setDynamicTrans] = useState(translations);
+
+  useEffect(() => {
+    // Note: Migrated to Headless WordPress. 
+    // Dynamic fetching of hero, about, services content is temporarily bypassed and uses hardcoded translations.
+    // If you add Advanced Custom Fields (ACF) or WP Pages later, you can fetch from /wp-json/wp/v2/ here.
+    setDynamicTrans(translations);
+  }, [language]);
 
   const t = (key: keyof typeof translations['en']) => {
-    return translations[language][key] || translations['en'][key];
+    return dynamicTrans[language]?.[key] || translations['en'][key];
   };
 
   return (

@@ -1,6 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { MessageCircle, X, Send } from 'lucide-react';
-import { GoogleGenAI } from "@google/genai";
 import { motion, AnimatePresence } from 'motion/react';
 import Markdown from 'react-markdown';
 import { useLanguage } from '../contexts/LanguageContext';
@@ -40,113 +39,38 @@ const Chatbot: React.FC = () => {
     setIsLoading(true);
 
     try {
-      const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY || '' });
-      
       const languageInstruction = language === 'zh' ? 'Please respond in Simplified Chinese.' : language === 'ms' ? 'Please respond in Bahasa Malaysia.' : 'Please respond in English.';
-      const systemPrompt = `You are a chatbot for a software development and AI consulting & implementation company.
-
-1. Scope Control (STRICT)
-Only respond to topics related to:
-Software development
-AI solutions / automation
-System integration
-Digital transformation
-Company services, case studies, or website content
-If the message is unrelated, vague nonsense, spam, or random text -> treat as out-of-scope.
-
-2. Tone & Style
-Keep replies very short, clear, human-like
-Use neutral, professional tone
-No long explanations, no “sales fluff”
-Avoid technical overload unless asked
-Optional light emoji (🙂👍) only when natural
-
-3. Website Context
-Prioritize answers based on website content
-If unsure -> stay general + guide to contact team
-Do NOT hallucinate services
-
-4. Pricing Rule (IMPORTANT)
-If user asks about price, cost, budget:
-Respond with EXACTLY this sentence:
-"Pricing depends on your requirements 🙂 Let’s walk you through it in a quick demo. Please connect with our team on WhatsApp here: [Chat with Vosme](https://wa.me/60187607799)"
-DO NOT paraphrase.
-DO NOT:
-Give numbers
-Estimate ranges
-Over-explain pricing
-
-5. Nonsense / Spam Handling (Auto-Stop Logic)
-Step 1 — First nonsense input:
-Reply:
-“I can only help with software & AI solutions 🙂”
-Step 2 — Repeated nonsense (2–3 times):
-Reply:
-“Let me know when you have a business-related question 👍”
-Step 3 — Continued nonsense:
-STOP responding
-Enter silent mode
-
-6. Silent Mode Behavior
-Do NOT reply to further messages
-Stay silent indefinitely
-ONLY resume when:
-A message clearly relates to:
-software development
-AI
-business solutions
-company services
-When valid topic detected:
-Reply normally again (no mention of silent mode)
-
-7. General Contact & Demos (MANDATORY RULE)
-If the user agrees to a demo, wants to contact a human, or gets to the end of a conversation, you MUST explicitly provide the WhatsApp link.
-Example response: "Great! Please connect with our team on WhatsApp to proceed: [Click here to chat](https://wa.me/60187607799)"
-NEVER forget to include the link https://wa.me/60187607799 when directing them to WhatsApp.
-
-7. Fallback Handling
-If message is unclear but possibly relevant:
-Ask ONE short clarifying question only
-Example:
-“Can you share more details about your project?”
-
-8. Response Length Rule
-Max: 1–2 short sentences
-Prefer direct answers or CTA
-Avoid paragraphs
-
-9. Goal
-Filter out low-quality users
-Convert serious leads to WhatsApp demo
-Keep conversation efficient and professional
-
-${languageInstruction}`;
-
-      // Convert messages to Content format for the API
-      // Note: The API expects 'user' and 'model' roles.
-      // Filter out the initial greeting if it exists (it's usually the first message and is from 'model')
-      const historyMessages = messages.filter((_, index) => index !== 0);
       
+      const historyMessages = messages.filter((_, index) => index !== 0);
       const history = historyMessages.map(m => ({
         role: m.role,
         parts: [{ text: m.text }],
       }));
 
-      // Add the new message
       const contents = [
         ...history,
         { role: 'user', parts: [{ text: userMessage }] }
       ];
 
-      const response = await ai.models.generateContent({
-        model: "gemini-2.5-flash",
-        contents: contents,
-        config: {
-          systemInstruction: systemPrompt,
+      const wpUrl = import.meta.env.VITE_WP_URL || 'https://vosme-international.com/ai';
+      const fetchResponse = await fetch(`${wpUrl}/wp-json/vosme/v1/chat`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
         },
+        body: JSON.stringify({ contents, languageInstruction }),
       });
 
-      const responseText = response.text || t('chatError') || 'No response generated.';
+      if (!fetchResponse.ok) {
+        if (fetchResponse.status === 403 || fetchResponse.status === 500) {
+          const errText = await fetchResponse.text();
+          throw new Error(errText);
+        }
+        throw new Error('Network response was not ok');
+      }
+
+      const data = await fetchResponse.json();
+      const responseText = data.text || t('chatError') || 'No response generated.';
 
       setMessages(prev => [...prev, { role: 'model', text: responseText }]);
     } catch (error) {

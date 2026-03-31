@@ -3,7 +3,6 @@ import { motion } from 'motion/react';
 import { Sparkles, Loader2, MessageCircle, AlertCircle } from 'lucide-react';
 import Markdown from 'react-markdown';
 import { useLanguage } from '../contexts/LanguageContext';
-import { GoogleGenAI } from "@google/genai";
 
 const AISuggestion: React.FC = () => {
   const [industry, setIndustry] = useState('');
@@ -37,27 +36,36 @@ Current Tools: ${tools}
 Estimated Impact: ${estimatedImpact}
     `.trim();
 
+    const wpUrl = import.meta.env.VITE_WP_URL || 'https://vosme-international.com/ai';
+
     try {
       const languageInstruction = language === 'zh' ? 'Please respond in Simplified Chinese.' : language === 'ms' ? 'Please respond in Bahasa Malaysia.' : 'Please respond in English.';
-      const systemPrompt = `You are an expert AI implementation strategist for Vosme.
-The user will provide details about their business, team, workflows, and challenges.
-Your goal is to provide 2-3 specific, actionable AI implementation suggestions that would genuinely help them.
-Do not hallucinate. Be extremely concise but professional. Tell them EXACTLY what AI tool or system to use to solve their problem.
 
-${languageInstruction}`;
-
-      const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY || '' });
-      
-      const response = await ai.models.generateContent({
-        model: "gemini-2.5-flash",
-        contents: fullDescription,
-        config: {
-          systemInstruction: systemPrompt,
+      const response = await fetch(`${wpUrl}/wp-json/vosme/v1/suggest`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
         },
+        body: JSON.stringify({
+          industry,
+          businessType,
+          teamSize,
+          workflow,
+          challenges,
+          tools,
+          estimatedImpact,
+          languageInstruction
+        })
       });
 
-      if (response.text) {
-        setSuggestion(response.text);
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+
+      const data = await response.json();
+      
+      if (data.text) {
+        setSuggestion(data.text);
       } else {
         throw new Error('No response generated');
       }
